@@ -91,6 +91,35 @@ app.post("/projects", (req, res) => {
   }
 });
 
+app.delete("/projects/:id", (req, res) => {
+  const { id } = req.params;
+  projects
+    .get(id)
+    .then(project => {
+      projects
+        .remove(project.id)
+        .then(count => {
+          if (count > 0) {
+            res.status(200).json(project);
+          } else {
+            res.status(404).json({
+              message: "The project with the specified ID does not exist."
+            });
+          }
+        })
+        .catch(err => {
+          console.log("error", err);
+          res.status(500).json({ error: "The project could not be removed." });
+        });
+    })
+    .catch(err => {
+      console.log("error", err);
+      res.status(404).json({
+        message: "The project with the specified ID does not exist."
+      });
+    });
+});
+
 //Actions CRUD Ops
 
 app.get("/actions", (req, res) => {
@@ -125,6 +154,57 @@ app.get("/actions/:id", (req, res) => {
       res
         .status(500)
         .json({ error: "The action information could not be retrieved." });
+    });
+});
+
+app.post("/actions", (req, res) => {
+  const newAction = req.body;
+  if (newAction.project_id && newAction.description && newAction.notes) {
+    actions
+      .insert(newAction)
+      .then(action => {
+        res.status(201).json(action);
+      })
+      .catch(err => {
+        console.log("error", err);
+        res.status(500).json({
+          error: "There was an error while saving the action to the database."
+        });
+      });
+  } else {
+    res.status(400).json({
+      error:
+        "Please provide a project ID, description, and ntoes for the action."
+    });
+  }
+});
+
+app.delete("/actions/:id", (req, res) => {
+  const { id } = req.params;
+  actions
+    .get(id)
+    .then(action => {
+      actions
+        .remove(action.id)
+        .then(count => {
+          if (count > 0) {
+            res.status(200).json(action);
+          } else {
+            res.status(404).json({
+              message: "The action with the specified ID does not exist."
+            });
+          }
+        })
+        .catch(err => {
+          console.log("error", err);
+          res.status(500).json({ error: "The action could not be removed." });
+        });
+    })
+    .catch(err => {
+      console.log("error", err);
+      res.status(404).json({
+        message: "The project with the specified ID does not exist."
+      });
     });
 });
 
