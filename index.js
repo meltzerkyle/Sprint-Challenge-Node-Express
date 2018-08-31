@@ -1,10 +1,14 @@
 const express = require("express");
 
+const cors = require("cors");
+
 const projects = require("./data/helpers/projectModel.js");
 
 const actions = require("./data/helpers/actionModel.js");
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 
@@ -33,7 +37,6 @@ app.get("/projects/:id", (req, res) => {
   projects
     .get(id)
     .then(project => {
-      console.log(project);
       if (project.id) {
         res.status(200).json(project);
       } else {
