@@ -91,6 +91,52 @@ app.post("/projects", (req, res) => {
   }
 });
 
+app.put("/projects/:id", (req, res) => {
+  const { name, description } = req.body;
+  const { id } = req.params;
+  if (id != Number(id)) {
+    res.status(400).json({ message: "Please enter a valid user ID." });
+  } else if (name && description) {
+    projects
+      .update(id, req.body)
+      .then(count => {
+        if (count) {
+          projects
+            .get(id)
+            .then(project => {
+              if (project.id) {
+                res.status(200).json(project);
+              } else {
+                res.status(404).json({
+                  message: "The project with the specified ID does not exist."
+                });
+              }
+            })
+            .catch(err => {
+              console.log("error", err);
+              res.status(500).json({
+                error: "The project information could not be retrieved."
+              });
+            });
+        } else {
+          res.status(404).json({
+            message: "The project with the specified ID does not exist."
+          });
+        }
+      })
+      .catch(err => {
+        console.log("error", err);
+        res
+          .status(500)
+          .json({ error: "The project information could not be modified." });
+      });
+  } else {
+    res.status(400).json({
+      error: "Please provide a name and description for the project."
+    });
+  }
+});
+
 app.delete("/projects/:id", (req, res) => {
   const { id } = req.params;
   projects
@@ -174,7 +220,54 @@ app.post("/actions", (req, res) => {
   } else {
     res.status(400).json({
       error:
-        "Please provide a project ID, description, and ntoes for the action."
+        "Please provide a project ID, description, and notes for the action."
+    });
+  }
+});
+
+app.put("/actions/:id", (req, res) => {
+  const { project_id, description, notes } = req.body;
+  const { id } = req.params;
+  if (id != Number(id)) {
+    res.status(400).json({ message: "Please enter a valid post ID." });
+  } else if (project_id && description && notes) {
+    actions
+      .update(id, req.body)
+      .then(count => {
+        if (count) {
+          actions
+            .get(id)
+            .then(action => {
+              if (action) {
+                res.status(200).json(action);
+              } else {
+                res.status(404).json({
+                  message: "The action with the specified ID does not exist."
+                });
+              }
+            })
+            .catch(err => {
+              console.log("error", err);
+              res.status(500).json({
+                error: "The action information could not be retrieved."
+              });
+            });
+        } else {
+          res.status(404).json({
+            message: "The action with the specified ID does not exist."
+          });
+        }
+      })
+      .catch(err => {
+        console.log("error", err);
+        res
+          .status(500)
+          .json({ error: "The post information could not be modified." });
+      });
+  } else {
+    res.status(400).json({
+      error:
+        "Please provide a project ID, description, and notes for the action."
     });
   }
 });
